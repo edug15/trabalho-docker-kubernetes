@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: demo-gcs
+spec:
+  # ClusterIP é suficiente, o acesso externo será feito de forma segura via port-forward
+  type: ClusterIP
+  selector:
+    app: demo-gcs
+  ports:
+    - protocol: TCP
+      port: 5000
+      targetPort: 5000

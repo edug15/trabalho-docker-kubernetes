@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-gcs
+  labels:
+    app: demo-gcs
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: demo-gcs
+  template:
+    metadata:
+      labels:
+        app: demo-gcs
+    spec:
+      containers:
+      - name: app
+        image: app:2.0
+        # IfNotPresent garante que o K8s use a imagem local carregada no Minikube
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 5000
+        # Limites de recursos garantem que os Pods não monopolizem o cluster
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "100m"
+          limits:
+            memory: "128Mi"
+            cpu: "250m"
+        # ReadinessProbe garante que o tráfego só chegue quando a aplicação estiver pronta
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 2
+          periodSeconds: 5
+        # LivenessProbe reinicia o container se a aplicação travar
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 5
+          periodSeconds: 10
